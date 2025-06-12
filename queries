@@ -1,0 +1,337 @@
+CREATE TABLE `activity_log` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `user_id` int NOT NULL,
+   `actions` varchar(255) NOT NULL,
+   `duration` datetime NOT NULL,
+   `details` text,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `activity_log_user_id_foreign` (`user_id`),
+   CONSTRAINT `activity_log_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `bank_accounts` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `Type` varchar(255) NOT NULL,
+   `country` varchar(50) NOT NULL,
+   `currency` varchar(10) NOT NULL,
+   `routing_number` varchar(50) DEFAULT NULL,
+   `account_number` varchar(50) NOT NULL,
+   `account_holder_name` varchar(255) NOT NULL,
+   `account_holder_type` enum('individual','company') NOT NULL,
+   `expert_id` int DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `expert_id` (`expert_id`),
+   CONSTRAINT `bank_accounts_ibfk_1` FOREIGN KEY (`expert_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `cart` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `course_id` int NOT NULL,
+   `user_id` int NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `cart_course_id_foreign` (`course_id`),
+   KEY `chart_user_id_foreign` (`user_id`),
+   CONSTRAINT `cart_course_id_foreign` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+   CONSTRAINT `cart_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `categories` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `name` varchar(255) NOT NULL,
+   `description` varchar(255) DEFAULT NULL,
+   `parent_id` int DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `categories_parent_id_foreign` (`parent_id`),
+   CONSTRAINT `categories_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
+ )
+ CREATE TABLE `chapters` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `course_id` int NOT NULL,
+   `title` varchar(255) NOT NULL,
+   `sequence` int NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `chapters_course_id_foreign` (`course_id`),
+   CONSTRAINT `capters_course_id_foreign` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `chats` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `sender_id` int NOT NULL,
+   `receiver_id` int NOT NULL,
+   `status` enum('read','unread') DEFAULT NULL,
+   `deleted_by_sender` tinyint(1) DEFAULT '0',
+   `deleted_by_receiver` tinyint(1) DEFAULT '0',
+   `message` varchar(255) DEFAULT NULL,
+   `is_read` tinyint(1) DEFAULT '0',
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `chat_sender_id_foreign` (`sender_id`),
+   KEY `chat_receiver_id_foreign` (`receiver_id`),
+   CONSTRAINT `chat_receiver_id_foreign` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+   CONSTRAINT `chat_sender_id_foreign` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `commission` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `commission` int NOT NULL DEFAULT '1',
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`)
+ ) 
+ CREATE TABLE `course_tags` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `course_id` int NOT NULL,
+   `tag_id` int NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `course_tags_course_id_foreign` (`course_id`),
+   KEY `course_tags_tag_id_foreign` (`tag_id`),
+   CONSTRAINT `course_tags_course_id_foreign` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+   CONSTRAINT `course_tags_tag_id_foreign` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `courses` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `expert_id` int NOT NULL,
+   `category_id` int NOT NULL,
+   `title` varchar(255) NOT NULL,
+   `price` decimal(10,2) NOT NULL,
+   `status` enum('active','pending','inactive') NOT NULL,
+   `thumbnail` varchar(255) DEFAULT NULL,
+   `total_duration` int DEFAULT '0',
+   `access` varchar(255) DEFAULT NULL,
+   `enrolled` int DEFAULT '0',
+   `discount` int DEFAULT '0',
+   `description` text,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `courses_expert_id_foreign` (`expert_id`),
+   KEY `courses_category_id_foreign` (`category_id`),
+   CONSTRAINT `courses_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
+   CONSTRAINT `courses_expert_id_foreign` FOREIGN KEY (`expert_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `event_tickets` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `event_id` int NOT NULL,
+   `user_id` int NOT NULL,
+   `purchase_date` datetime NOT NULL,
+   `status` enum('valid','used','expired') NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `event_tickets_event_id_foreign` (`event_id`),
+   KEY `event_tickets_user_id_foreign` (`user_id`),
+   CONSTRAINT `event_tickets_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
+   CONSTRAINT `event_tickets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `events` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `admin_id` int NOT NULL,
+   `title` varchar(255) NOT NULL,
+   `description` text NOT NULL,
+   `event_date` timestamp NOT NULL,
+   `ticket_price` decimal(10,2) NOT NULL,
+   `status` enum('upcoming','live','past') NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `events_admin_id_foreign` (`admin_id`),
+   CONSTRAINT `events_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ )
+
+ CREATE TABLE `favourite_courses` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `user_id` int NOT NULL,
+   `course_id` int NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `user_id` (`user_id`),
+   KEY `course_id` (`course_id`),
+   CONSTRAINT `favourite_courses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+   CONSTRAINT `favourite_courses_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
+ ) 
+ CREATE TABLE `favourites` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `favourite` int NOT NULL,
+   `favourite_by` int NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `favourite` (`favourite`),
+   KEY `favourite_by` (`favourite_by`),
+   CONSTRAINT `favourites_ibfk_1` FOREIGN KEY (`favourite`) REFERENCES `users` (`id`)ON DELETE CASCADE,
+   CONSTRAINT `favourites_ibfk_2` FOREIGN KEY (`favourite_by`) REFERENCES `users` (`id`)ON DELETE CASCADE
+ ) 
+ CREATE TABLE `lessons` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `title` varchar(255) NOT NULL,
+   `video_url` varchar(255) DEFAULT NULL,
+   `text_content` text,
+   `duration` int DEFAULT NULL,
+   `sequence` int NOT NULL,
+   `chapter_id` int DEFAULT NULL,
+   `thumbnail` varchar(255) DEFAULT NULL,
+   `video_type` enum('youtube','vimeo','local') DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `lessons_chapter_id_foreign` (`chapter_id`),
+   CONSTRAINT `lessons_chapter_id_foreign` FOREIGN KEY (`chapter_id`) REFERENCES `chapters` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `notifications` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `user_id` int NOT NULL,
+   `message` text NOT NULL,
+   `status` enum('read','unread') NOT NULL,
+   `notification_date` datetime NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `notifications_user_id_foreign` (`user_id`),
+   CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `payments` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `user_id` int NOT NULL,
+   `amount` decimal(10,2) NOT NULL,
+   `payment_status` enum('paid','pending','failed') NOT NULL,
+   `transaction_id` varchar(255) DEFAULT NULL,
+   `payment_date` datetime NOT NULL,
+   `course_id` int DEFAULT NULL,
+   `payment_type` varchar(255) DEFAULT NULL,
+   `commission_rate` int DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `payments_user_id_foreign` (`user_id`),
+   KEY `fk_courses_id` (`course_id`),
+   CONSTRAINT `fk_courses_id` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`),
+   CONSTRAINT `payments_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `payout_requests` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `amount` int NOT NULL,
+   `expert_id` int DEFAULT NULL,
+   `is_paid` tinyint(1) DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `expert_id` (`expert_id`),
+   CONSTRAINT `payout_requests_ibfk_1` FOREIGN KEY (`expert_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `profiles` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `user_id` int NOT NULL,
+   `bio` varchar(255) DEFAULT NULL,
+   `website` varchar(255) DEFAULT NULL,
+   `social_media_links` varchar(255) DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   `company_name` varchar(255) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `profiles_user_id_foreign` (`user_id`),
+   CONSTRAINT `profiles_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+ CREATE TABLE `reviews` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `course_id` int NOT NULL,
+   `user_id` int NOT NULL,
+   `rating` int NOT NULL,
+   `comment` text,
+   `review_date` timestamp NULL DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `reviews_course_id_foreign` (`course_id`),
+   KEY `reviews_user_id_foreign` (`user_id`),
+   CONSTRAINT `reviews_course_id_foreign` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+   CONSTRAINT `reviews_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ )
+ CREATE TABLE `tags` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `name` varchar(255) NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`)
+ ) 
+ CREATE TABLE `user_progress` (
+   `user_id` int NOT NULL,
+   `course_id` int NOT NULL,
+   `lesson_id` int NOT NULL,
+   `completed` tinyint(1) DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`user_id`,`course_id`,`lesson_id`),
+   KEY `course_id` (`course_id`),
+   KEY `lesson_id` (`lesson_id`),
+   CONSTRAINT `user_progress_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)ON DELETE CASCADE,
+   CONSTRAINT `user_progress_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)ON DELETE CASCADE,
+   CONSTRAINT `user_progress_ibfk_3` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`)ON DELETE CASCADE
+ ) 
+ CREATE TABLE `users` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `name` varchar(255) NOT NULL,
+   `email` varchar(255) NOT NULL,
+   `email_verified_at` timestamp NULL DEFAULT NULL,
+   `user_type` enum('admin','expert','user') NOT NULL,
+   `profile_picture` varchar(255) DEFAULT NULL,
+   `status` tinyint(1) DEFAULT NULL,
+   `password_reset_token` varchar(255) DEFAULT NULL,
+   `password_reset_expiry` timestamp NULL DEFAULT NULL,
+   `google_id` varchar(255) DEFAULT NULL,
+   `password` varchar(255) DEFAULT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `users_email_unique` (`email`)
+ )
+ 
+ CREATE TABLE `withdrawal` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `transaction_id` varchar(255) DEFAULT NULL,
+   `expert_id` int NOT NULL,
+   `withdrawal_date` date NOT NULL,
+   `withdrawal_amount` decimal(10,2) NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   `withdrawal_status` enum('success','fail') DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `expert_id` (`expert_id`),
+   CONSTRAINT `withdrawal_ibfk_1` FOREIGN KEY (`expert_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+
+ CREATE TABLE `certificates` (
+   `certificate_id` varchar(255) NOT NULL,
+   `course_id` int NOT NULL,
+   `user_id` int NOT NULL,
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`certificate_id`),
+   KEY `certificates_course_id_foreign` (`course_id`),
+   KEY `certificates_user_id_foreign` (`user_id`),
+   CONSTRAINT `certificates_course_id_foreign` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+   CONSTRAINT `certificates_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
+
+ CREATE TABLE `support_chat` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `sender_id` int NOT NULL,
+   `receiver_id` int NOT NULL,
+    `message` varchar(255) DEFAULT NULL,
+    `is_read` tinyint(1) DEFAULT '0',
+   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   KEY `supportchat_sender_id_foreign` (`sender_id`),
+   KEY `supportchat_receiver_id_foreign` (`receiver_id`),
+   CONSTRAINT `supportchat_receiver_id_foreign` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+   CONSTRAINT `supportchat_sender_id_foreign` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+ ) 
